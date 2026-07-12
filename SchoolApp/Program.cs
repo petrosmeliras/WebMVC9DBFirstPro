@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolApp.Data;
+using SchoolApp.Repositories;
 
 namespace SchoolApp
 {
@@ -9,9 +10,11 @@ namespace SchoolApp
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Scoped - per request, Transient - new instance every time, Singleton - one instance for the entire application
+            // Scoped - per request
             var connString = builder.Configuration.GetConnectionString("DevConnection");
             builder.Services.AddDbContext<SchoolMvc9proContext>(options => options.UseSqlServer(connString));
+
+            builder.Services.AddRepositories(); 
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
