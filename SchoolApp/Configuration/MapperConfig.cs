@@ -13,9 +13,9 @@ namespace SchoolApp.Configuration
                 .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.Role.Name));
 
             CreateMap<TeacherSignupDTO, User>()
-                .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId!.Value)); 
-                
+                .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RoleId!.Value));
 
+            CreateMap<TeacherSignupDTO, Teacher>();
         }
 
 
