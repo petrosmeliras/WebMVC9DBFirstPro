@@ -12,7 +12,9 @@ namespace SchoolApp.Repositories
         {
         }
         public async Task<User?> GetUserByUsernameAsync(string username) =>
-            await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Username == username);
 
         public async Task<PaginatedResult<User>> GetUsersAsync(int pageNumber, int pageSize, 
             List<Expression<Func<User, bool>>> predicates)
