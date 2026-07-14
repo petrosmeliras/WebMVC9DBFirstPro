@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SchoolApp.Data;
 using SchoolApp.Repositories;
@@ -31,7 +33,22 @@ namespace SchoolApp
 
             builder.Services.AddSingleton<IEncryptionUtil, EncryptionUtil>();   
 
-            builder.Services.AddRepositories(); 
+            builder.Services.AddRepositories();
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.LoginPath = "/User/Login";
+                options.AccessDeniedPath = "/Home/AccessDenied";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.SlidingExpiration = true; // reset timeout
+            });
+
+            builder.Services.AddAuthorizationBuilder()
+                .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build()); 
+                //.AddPolicy("CanViewTeachers", policy => policy.RequireRole("Capability", "VIEW TEACHERS"))
+                //.AddPolicy("CanInsertTeacher", policy => policy.RequireClaim("Capability", "INSERT TEACHER"))
 
             builder.Services.AddAutoMapper(cfg => cfg.AddProfile<Configuration.MapperConfig>());
 
@@ -51,9 +68,10 @@ namespace SchoolApp
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapStaticAssets();
+            app.MapStaticAssets().AllowAnonymous();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
